@@ -23,6 +23,111 @@ function followupClass(date) {
   return "";
 }
 
+// ── User Management Modal ─────────────────────────────────────
+function UserManagementModal({ onClose, token }) {
+  const headers = { Authorization: `Bearer ${token}` };
+  const [users, setUsers] = useState([]);
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "caller" });
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => { fetchUsers(); }, []);
+
+  async function fetchUsers() {
+    try {
+      const res = await axios.get(`${API_URL}/users`, { headers });
+      setUsers(res.data);
+    } catch { setError("Failed to load users"); }
+  }
+
+  async function createUser(e) {
+    e.preventDefault();
+    setLoading(true); setMsg(""); setError("");
+    try {
+      await axios.post(`${API_URL}/users`, form, { headers });
+      setMsg(`✅ User "${form.name}" created successfully!`);
+      setForm({ name: "", email: "", password: "", role: "caller" });
+      fetchUsers();
+    } catch (err) {
+      setError(err.response?.data || "Error creating user");
+    } finally { setLoading(false); }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal modal-lg">
+        <div className="modal-header">
+          <h2>👥 Manage Users</h2>
+          <button className="close-btn" onClick={onClose}><X size={16} /></button>
+        </div>
+        <div style={{marginBottom:"24px"}}>
+          <h3 style={{marginBottom:"12px", fontSize:"14px", fontWeight:"600"}}>Create New User</h3>
+          <form onSubmit={createUser}>
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Full Name *</label>
+                <input value={form.name} onChange={e => setForm({...form, name: e.target.value})}
+                  placeholder="e.g. Ravi Kumar" required />
+              </div>
+              <div className="form-group">
+                <label>Email *</label>
+                <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
+                  placeholder="ravi@example.com" required />
+              </div>
+              <div className="form-group">
+                <label>Password *</label>
+                <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
+                  placeholder="••••••••" required />
+              </div>
+              <div className="form-group">
+                <label>Role</label>
+                <select value={form.role} onChange={e => setForm({...form, role: e.target.value})}>
+                  <option value="caller">Caller</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+            {msg && <div style={{color:"green",marginBottom:"10px"}}>{msg}</div>}
+            {error && <div className="error-msg">⚠️ {error}</div>}
+            <div className="modal-actions">
+              <button className="btn btn-primary" type="submit" disabled={loading}>
+                {loading ? <span className="spinner" /> : "➕ Create User"}
+              </button>
+            </div>
+          </form>
+        </div>
+        <div>
+          <h3 style={{marginBottom:"12px", fontSize:"14px", fontWeight:"600"}}>
+            Existing Users ({users.length})
+          </h3>
+          <div style={{overflowX:"auto"}}>
+            <table>
+              <thead>
+                <tr><th>#</th><th>Name</th><th>Email</th><th>Role</th></tr>
+              </thead>
+              <tbody>
+                {users.length === 0 ? (
+                  <tr><td colSpan={4} className="empty-cell">No users yet</td></tr>
+                ) : users.map((u, i) => (
+                  <tr key={u._id}>
+                    <td className="num-cell">{i + 1}</td>
+                    <td><strong>{u.name}</strong></td>
+                    <td className="mono">{u.email}</td>
+                    <td><span className={`badge ${u.role === "admin" ? "badge-converted" : "badge-contacted"}`}>
+                      {u.role}
+                    </span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Forgot Password Page ──────────────────────────────────────
 function ForgotPasswordPage({ onBack }) {
   const [email, setEmail] = useState("");
@@ -175,7 +280,6 @@ function LoginPage({ onLogin }) {
 
 // ── Main App ──────────────────────────────────────────────────
 export default function App() {
-  // Check if URL has reset token
   const urlToken = window.location.pathname.startsWith("/reset-password/")
     ? window.location.pathname.split("/reset-password/")[1]
     : null;
@@ -189,6 +293,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
+  const [showUsers, setShowUsers] = useState(false);
   const [editLead, setEditLead] = useState(null);
   const [previewData, setPreviewData] = useState([]);
   const [toast, setToast] = useState("");
@@ -303,9 +408,7 @@ export default function App() {
     contacted: leads.filter(l => l.status === "Contacted").length,
   };
 
-  // Show reset password page if URL has token
   if (urlToken) return <ResetPasswordPage token={urlToken} onBack={() => window.location.href = "/"} />;
-
   if (!user) return <LoginPage onLogin={u => { setUser(u); }} />;
 
   return (
@@ -319,6 +422,11 @@ export default function App() {
           </div>
         </div>
         <div className="header-right">
+          {user?.role === "admin" && (
+            <button className="btn btn-outline btn-sm" onClick={() => setShowUsers(true)}>
+              <Users size={14} /> Manage Users
+            </button>
+          )}
           <button className="btn btn-outline btn-sm" onClick={() => setShowUpload(true)}>
             <Upload size={14} /> Upload Excel
           </button>
@@ -490,6 +598,10 @@ export default function App() {
             )}
           </div>
         </div>
+      )}
+
+      {showUsers && user?.role === "admin" && (
+        <UserManagementModal onClose={() => setShowUsers(false)} token={token} />
       )}
 
       {toast && <div className="toast">{toast}</div>}
