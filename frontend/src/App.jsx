@@ -5,15 +5,10 @@ import { Phone, MessageSquare, Plus, LogOut, Upload, X, Edit2, Trash2, CheckCirc
 
 const API_URL = "https://careeradvisor-4u-crm-1.onrender.com/api";
 
-// ── Helpers ──────────────────────────────────────────────────
 function statusBadge(s) {
   const map = {
-    New:           "badge-new",
-    Contacted:     "badge-contacted",
-    Interested:    "badge-interested",
-    "Not Interested": "badge-notinterested",
-    Closed:        "badge-closed",
-    Converted:     "badge-converted",
+    New: "badge-new", Contacted: "badge-contacted", Interested: "badge-interested",
+    "Not Interested": "badge-notinterested", Closed: "badge-closed", Converted: "badge-converted",
   };
   return map[s] || "badge-new";
 }
@@ -28,12 +23,110 @@ function followupClass(date) {
   return "";
 }
 
+// ── Forgot Password Page ──────────────────────────────────────
+function ForgotPasswordPage({ onBack }) {
+  const [email, setEmail] = useState("");
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true); setMsg(""); setError("");
+    try {
+      await axios.post(`${API_URL}/forgot-password`, { email });
+      setMsg("✅ Reset email sent! Check your inbox.");
+    } catch (err) {
+      setError(err.response?.data || "Something went wrong");
+    } finally { setLoading(false); }
+  }
+
+  return (
+    <div className="login-bg">
+      <div className="login-card">
+        <div className="login-logo">🔐</div>
+        <h1 className="login-title">Forgot Password</h1>
+        <p className="login-sub">Enter your email to receive a reset link</p>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Email</label>
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com" required />
+          </div>
+          {msg && <div style={{color:"green",marginBottom:"10px"}}>{msg}</div>}
+          {error && <div className="error-msg">⚠️ {error}</div>}
+          <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
+            {loading ? <span className="spinner" /> : "Send Reset Link"}
+          </button>
+        </form>
+        <p style={{textAlign:"center",marginTop:"16px"}}>
+          <button className="btn btn-ghost btn-sm" onClick={onBack}>← Back to Login</button>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Reset Password Page ───────────────────────────────────────
+function ResetPasswordPage({ token, onBack }) {
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (password !== confirm) { setError("Passwords do not match"); return; }
+    setLoading(true); setMsg(""); setError("");
+    try {
+      await axios.post(`${API_URL}/reset-password/${token}`, { password });
+      setMsg("✅ Password reset successful! You can now login.");
+    } catch (err) {
+      setError(err.response?.data || "Invalid or expired link");
+    } finally { setLoading(false); }
+  }
+
+  return (
+    <div className="login-bg">
+      <div className="login-card">
+        <div className="login-logo">🔑</div>
+        <h1 className="login-title">Reset Password</h1>
+        <p className="login-sub">Enter your new password</p>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>New Password</label>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••" required />
+          </div>
+          <div className="form-group">
+            <label>Confirm Password</label>
+            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
+              placeholder="••••••••" required />
+          </div>
+          {msg && <div style={{color:"green",marginBottom:"10px"}}>{msg}</div>}
+          {error && <div className="error-msg">⚠️ {error}</div>}
+          <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
+            {loading ? <span className="spinner" /> : "Reset Password"}
+          </button>
+        </form>
+        <p style={{textAlign:"center",marginTop:"16px"}}>
+          <button className="btn btn-ghost btn-sm" onClick={onBack}>← Back to Login</button>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Login Page ────────────────────────────────────────────────
 function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+
+  if (showForgot) return <ForgotPasswordPage onBack={() => setShowForgot(false)} />;
 
   async function handleLogin(e) {
     e.preventDefault();
@@ -70,6 +163,11 @@ function LoginPage({ onLogin }) {
             {loading ? <span className="spinner" /> : "Sign In"}
           </button>
         </form>
+        <p style={{textAlign:"center",marginTop:"12px"}}>
+          <button className="btn btn-ghost btn-sm" onClick={() => setShowForgot(true)}>
+            Forgot password?
+          </button>
+        </p>
       </div>
     </div>
   );
@@ -77,6 +175,11 @@ function LoginPage({ onLogin }) {
 
 // ── Main App ──────────────────────────────────────────────────
 export default function App() {
+  // Check if URL has reset token
+  const urlToken = window.location.pathname.startsWith("/reset-password/")
+    ? window.location.pathname.split("/reset-password/")[1]
+    : null;
+
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("crm_user")); } catch { return null; }
   });
@@ -155,7 +258,6 @@ export default function App() {
     } catch { showToast("❌ Delete failed"); }
   }
 
-  // Excel upload
   function handleFile(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -187,7 +289,6 @@ export default function App() {
     fetchLeads();
   }
 
-  // Filtered leads
   const filtered = leads.filter(l => {
     const matchFilter = filter === "All" || l.status === filter;
     const matchSearch = l.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -195,7 +296,6 @@ export default function App() {
     return matchFilter && matchSearch;
   });
 
-  // Stats
   const stats = {
     total: leads.length,
     interested: leads.filter(l => l.status === "Interested").length,
@@ -203,11 +303,13 @@ export default function App() {
     contacted: leads.filter(l => l.status === "Contacted").length,
   };
 
+  // Show reset password page if URL has token
+  if (urlToken) return <ResetPasswordPage token={urlToken} onBack={() => window.location.href = "/"} />;
+
   if (!user) return <LoginPage onLogin={u => { setUser(u); }} />;
 
   return (
     <div className="app">
-      {/* HEADER */}
       <div className="header">
         <div className="header-left">
           <span className="logo">⚡</span>
@@ -229,7 +331,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* STATS */}
       <div className="stats-row">
         <div className="stat-card">
           <div className="stat-icon blue"><Users size={18} /></div>
@@ -249,7 +350,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* TOOLBAR */}
       <div className="toolbar">
         <div className="search-box">
           <span>🔍</span>
@@ -263,15 +363,11 @@ export default function App() {
         <span className="count-label">{filtered.length} lead{filtered.length !== 1 ? "s" : ""}</span>
       </div>
 
-      {/* TABLE */}
       <div className="table-wrap">
         <div style={{ overflowX: "auto" }}>
           <table>
             <thead>
-              <tr>
-                <th>#</th><th>Name</th><th>Phone</th><th>Status</th>
-                <th>Follow-up</th><th>Actions</th>
-              </tr>
+              <tr><th>#</th><th>Name</th><th>Phone</th><th>Status</th><th>Follow-up</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {loading ? (
@@ -317,7 +413,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* ADD/EDIT MODAL */}
       {showModal && (
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowModal(false)}>
           <div className="modal">
@@ -354,7 +449,6 @@ export default function App() {
         </div>
       )}
 
-      {/* UPLOAD MODAL */}
       {showUpload && (
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowUpload(false)}>
           <div className="modal modal-lg">
@@ -398,7 +492,6 @@ export default function App() {
         </div>
       )}
 
-      {/* TOAST */}
       {toast && <div className="toast">{toast}</div>}
     </div>
   );
