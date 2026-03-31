@@ -47,6 +47,15 @@ app.post("/api/users", async (req, res) => {
     res.status(400).send("Error creating user");
   }
 });
+// ===== GET ALL USERS =====
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await User.find({}, "name email role");
+    res.json(users);
+  } catch (err) {
+    res.status(500).send("Error fetching users");
+  }
+});
 
 // ===== AUTO ASSIGN =====
 async function assignLead() {
