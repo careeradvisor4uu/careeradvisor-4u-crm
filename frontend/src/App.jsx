@@ -297,7 +297,7 @@ export default function App() {
   const [editLead, setEditLead] = useState(null);
   const [previewData, setPreviewData] = useState([]);
   const [toast, setToast] = useState("");
-  const [form, setForm] = useState({ name: "", phone: "", status: "New", followUp: "" });
+  const [form, setForm] = useState({ name: "", phone: "", status: "", followUp: "" });
   const fileRef = useRef();
 
   const token = localStorage.getItem("crm_token");
@@ -537,12 +537,11 @@ export default function App() {
                 <label>Phone Number *</label>
                 <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="e.g. 9876543210" />
               </div>
-              <div className="form-group">
-                <label>Status</label>
-                <select value={form.status} onChange={e => setForm({...form, status: e.target.value})}>
-                  {["New","Contacted","Interested","Not Interested","Closed","Converted"].map(s =>
-                    <option key={s}>{s}</option>)}
-                </select>
+             <div className="form-group">
+              <label>Status</label>
+              <input value={form.status} onChange={e => setForm({...form, status: e.target.value})}
+              placeholder="e.g. Interested, Called back..." />
+             </div>
               </div>
               <div className="form-group">
                 <label>Follow-up Date</label>
