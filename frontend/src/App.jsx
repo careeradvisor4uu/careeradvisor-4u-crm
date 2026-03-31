@@ -297,7 +297,7 @@ export default function App() {
   const [editLead, setEditLead] = useState(null);
   const [previewData, setPreviewData] = useState([]);
   const [toast, setToast] = useState("");
-  const [form, setForm] = useState({ name: "", phone: "", status: "", followUp: "" });
+  const [form, setForm] = useState({ name: "", phone: "", status: "", followUp: "", followUpTime: "" });
   const fileRef = useRef();
 
   const token = localStorage.getItem("crm_token");
@@ -327,13 +327,19 @@ export default function App() {
 
   function openAdd() {
     setEditLead(null);
-    setForm({ name: "", phone: "", status: "", followUp: "" });
+    setForm({ name: "", phone: "", status: "", followUp: "", followUpTime: "" });
     setShowModal(true);
   }
 
   function openEdit(lead) {
     setEditLead(lead);
-    setForm({ name: lead.name, phone: lead.phone, status: lead.status, followUp: lead.followUp || "" });
+    setForm({
+      name: lead.name,
+      phone: lead.phone,
+      status: lead.status,
+      followUp: lead.followUp || "",
+      followUpTime: lead.followUpTime || ""
+    });
     setShowModal(true);
   }
 
@@ -376,6 +382,7 @@ export default function App() {
         phone: String(r.Phone || r.phone || r.Number || r.number || "").trim(),
         status: String(r.Status || r.status || "").trim(),
         followUp: String(r.FollowUp || r.followUp || r.Followup || r["Follow-up"] || "").trim(),
+        followUpTime: String(r.FollowUpTime || r.followUpTime || "").trim(),
       })).filter(r => r.name && r.phone);
       setPreviewData(mapped);
     };
@@ -475,13 +482,13 @@ export default function App() {
         <div style={{ overflowX: "auto" }}>
           <table>
             <thead>
-              <tr><th>#</th><th>Name</th><th>Phone</th><th>Status</th><th>Follow-up</th><th>Actions</th></tr>
+              <tr><th>#</th><th>Name</th><th>Phone</th><th>Status</th><th>Follow-up</th><th>Time</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="empty-cell"><div className="spinner-lg" /></td></tr>
+                <tr><td colSpan={7} className="empty-cell"><div className="spinner-lg" /></td></tr>
               ) : filtered.length === 0 ? (
-                <tr><td colSpan={6} className="empty-cell">
+                <tr><td colSpan={7} className="empty-cell">
                   <div className="empty-state"><div className="empty-icon">📭</div><p>No leads found</p></div>
                 </td></tr>
               ) : filtered.map((l, i) => {
@@ -495,6 +502,11 @@ export default function App() {
                     <td>
                       {l.followUp
                         ? <span className={`followup ${fc}`}>📅 {l.followUp}</span>
+                        : <span className="muted">—</span>}
+                    </td>
+                    <td>
+                      {l.followUpTime
+                        ? <span>🕐 {l.followUpTime}</span>
                         : <span className="muted">—</span>}
                     </td>
                     <td>
@@ -545,6 +557,10 @@ export default function App() {
               <div className="form-group">
                 <label>Follow-up Date</label>
                 <input type="date" value={form.followUp} onChange={e => setForm({...form, followUp: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>Follow-up Time</label>
+                <input type="time" value={form.followUpTime} onChange={e => setForm({...form, followUpTime: e.target.value})} />
               </div>
             </div>
             <div className="modal-actions">
