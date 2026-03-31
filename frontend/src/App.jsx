@@ -327,7 +327,7 @@ export default function App() {
 
   function openAdd() {
     setEditLead(null);
-    setForm({ name: "", phone: "", status: "New", followUp: "" });
+    setForm({ name: "", phone: "", status: "", followUp: "" });
     setShowModal(true);
   }
 
@@ -374,7 +374,7 @@ export default function App() {
       const mapped = rows.map(r => ({
         name: String(r.Name || r.name || "").trim(),
         phone: String(r.Phone || r.phone || r.Number || r.number || "").trim(),
-        status: String(r.Status || r.status || "New").trim() || "New",
+        status: String(r.Status || r.status || "").trim(),
         followUp: String(r.FollowUp || r.followUp || r.Followup || r["Follow-up"] || "").trim(),
       })).filter(r => r.name && r.phone);
       setPreviewData(mapped);
@@ -537,11 +537,10 @@ export default function App() {
                 <label>Phone Number *</label>
                 <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="e.g. 9876543210" />
               </div>
-             <div className="form-group">
-              <label>Status</label>
-              <input value={form.status} onChange={e => setForm({...form, status: e.target.value})}
-              placeholder="e.g. Interested, Called back..." />
-             </div>
+              <div className="form-group">
+                <label>Status</label>
+                <input value={form.status} onChange={e => setForm({...form, status: e.target.value})}
+                  placeholder="e.g. Interested, Called back..." />
               </div>
               <div className="form-group">
                 <label>Follow-up Date</label>
