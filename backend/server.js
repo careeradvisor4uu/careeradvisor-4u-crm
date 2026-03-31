@@ -120,5 +120,8 @@ app.put("/api/leads/:id", async (req, res) => {
   }
 });
 
-const PORT = 5000;
+// Health check
+app.get('/health', (_, res) => res.json({ status: 'ok', time: new Date() }));
+
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Advanced CRM Backend Running on port ${PORT}`));
