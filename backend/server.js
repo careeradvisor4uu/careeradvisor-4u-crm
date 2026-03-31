@@ -56,3 +56,23 @@ app.post("/api/reset-password/:token", async (req, res) => {
     res.status(500).send("Error resetting password");
   }
 });
+// Health check
+app.get('/health', (_, res) => res.json({ status: 'ok', time: new Date() }));
+
+// ===== PASTE HERE =====
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+
+// ===== FORGOT PASSWORD =====
+app.post("/api/forgot-password", async (req, res) => {
+  ... (your forgot password code)
+});
+
+// ===== RESET PASSWORD =====
+app.post("/api/reset-password/:token", async (req, res) => {
+  ... (your reset password code)
+});
+
+// THIS MUST BE LAST LINE
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => console.log(`Advanced CRM Backend Running on port ${PORT}`));
