@@ -3,9 +3,9 @@ import io from "socket.io-client";
 import axios from "axios";
 import { Phone, MessageSquare, CheckCircle, Clock } from "lucide-react";
 
-// Assuming backend runs on 5000
-const API_URL = "http://localhost:5000/api";
-const SOCKET_URL = "http://localhost:5000";
+// Production backend on Render
+const API_URL = "https://careeradvisor-4u-crm-1.onrender.com/api";
+const SOCKET_URL = "https://careeradvisor-4u-crm-1.onrender.com";
 
 export default function App() {
   const [leads, setLeads] = useState([]);
