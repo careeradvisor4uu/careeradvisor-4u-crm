@@ -36,7 +36,7 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
-// ===== ADMIN ROUTE TO CREATE USER =====
+// ===== CREATE USER =====
 app.post("/api/users", async (req, res) => {
   try {
     const user = new User(req.body);
@@ -47,6 +47,7 @@ app.post("/api/users", async (req, res) => {
     res.status(400).send("Error creating user");
   }
 });
+
 // ===== GET ALL USERS =====
 app.get("/api/users", async (req, res) => {
   try {
@@ -110,6 +111,16 @@ app.put("/api/leads/:id", async (req, res) => {
   }
 });
 
+// ===== DELETE LEAD =====
+app.delete("/api/leads/:id", async (req, res) => {
+  try {
+    await Lead.findByIdAndDelete(req.params.id);
+    res.json({ message: "Lead deleted" });
+  } catch (err) {
+    res.status(400).send("Error deleting lead");
+  }
+});
+
 // ===== FORGOT PASSWORD =====
 app.post("/api/forgot-password", async (req, res) => {
   try {
@@ -159,7 +170,7 @@ app.post("/api/reset-password/:token", async (req, res) => {
   }
 });
 
-// Health check
+// ===== HEALTH CHECK =====
 app.get('/health', (_, res) => res.json({ status: 'ok', time: new Date() }));
 
 const PORT = process.env.PORT || 5000;
