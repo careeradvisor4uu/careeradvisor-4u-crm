@@ -6,7 +6,7 @@ import * as Device from "expo-device";
 import io from "socket.io-client";
 
 // REPLACE WITH YOUR MACHINE'S LOCAL WIFI IP ADDRESS (Windows: ipconfig)
-const API = "http://192.168.1.100:5000"; 
+const API = "http://192.168.0.108:5000"; 
 let socket;
 
 export default function App() {
