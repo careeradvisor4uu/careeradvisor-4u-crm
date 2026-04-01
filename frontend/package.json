@@ -10,45 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-<<<<<<< HEAD
-    "axios": "^1.13.6",
-    "lucide-react": "^1.6.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-router-dom": "^7.13.2",
-    "socket.io-client": "^4.8.3",
-    "xlsx": "^0.18.5"
+    "axios": "^1.7.9",
+    "lucide-react": "^0.474.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.1.1"
   },
-=======
-  "axios": "^1.13.6",
-  "lucide-react": "^1.6.0",
-  "react": "^19.2.4",
-  "react-dom": "^19.2.4",
-  "react-router-dom": "^7.13.2",
-  "socket.io-client": "^4.8.3",
-  "xlsx": "^0.18.5"
-},
-    
->>>>>>> 35a267393e3975c5459497aac4ca8fb96aa0c1c6
   "devDependencies": {
-    "@eslint/js": "^9.39.4",
-    "@tailwindcss/postcss": "^4.2.2",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
-    "autoprefixer": "^10.4.18",
-    "eslint": "^9.39.4",
-<<<<<<< HEAD
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
-    "globals": "^17.4.0",
-    "postcss": "^8.5.8",
-    "tailwindcss": "^3.4.19",
-    "vite": "^8.0.1"
-=======
-    "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.1",
-    "vite": "^8.0.0"
->>>>>>> 35a267393e3975c5459497aac4ca8fb96aa0c1c6
+    "@eslint/js": "^9.17.0",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.0.5"
   }
 }
