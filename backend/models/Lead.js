@@ -1,15 +1,14 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const LeadSchema = new mongoose.Schema({
-  name: String,
-  phone: { type: String, unique: true, required: true },
-  course: String,
-  college: String,
-  status: { type: String, default: "New Lead", enum: ["New Lead", "Interested", "Follow-up", "Converted"] },
-  followUpDate: String,
-  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  notes: String,
-  createdAt: { type: Date, default: Date.now }
-});
+const leadSchema = new mongoose.Schema({
+  name:        { type: String, required: true, trim: true },
+  phone:       { type: String, trim: true },
+  marks:       { type: Number, min: 0, max: 1000 },
+  university:  { type: String, trim: true },
+  followUpDate:{ type: String },
+  time:        { type: String },
+  status:      { type: String, default: '' },
+  assignedTo:  { type: String, default: '' }, // telecaller name
+}, { timestamps: true });
 
-module.exports = mongoose.model("Lead", LeadSchema);
+module.exports = mongoose.model('Lead', leadSchema);
