@@ -15,6 +15,7 @@ app.use(express.json());
 app.use('/api/leads', require('./routes/leads'));
 app.use('/api/telecallers', require('./routes/telecallers'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api', require('./routes/auth'));
 app.use('/api/assignment', require('./routes/assignment'));
 app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/telecaller-dashboard', require('./routes/telecaller-dashboard'));
