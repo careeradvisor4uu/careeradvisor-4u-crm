@@ -482,6 +482,7 @@ function statusBadge(s) {
                     <td colSpan="9" className="p-10 text-center text-gray-500 italic">No leads found.</td>
                   </tr>
                 )}
+=======
 function followupClass(date) {
   if (!date) return "";
   const d = new Date(date);
