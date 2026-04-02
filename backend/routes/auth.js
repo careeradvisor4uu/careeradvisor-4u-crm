@@ -21,7 +21,10 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
-    router.get('/seed-admin', async (req, res) => {
+  }
+});
+
+router.get('/seed-admin', async (req, res) => {
   try {
     const hash = await bcrypt.hash('Admin123', 10);
     await User.deleteMany({ email: 'siva22110109@gmail.com' });
@@ -38,4 +41,3 @@ router.post('/login', async (req, res) => {
 });
 
 module.exports = router;
-  
