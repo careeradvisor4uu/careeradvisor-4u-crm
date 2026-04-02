@@ -21,7 +21,21 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
+    router.get('/seed-admin', async (req, res) => {
+  try {
+    const hash = await bcrypt.hash('Admin123', 10);
+    await User.deleteMany({ email: 'siva22110109@gmail.com' });
+    await User.create({
+      name: 'Siva',
+      email: 'siva22110109@gmail.com',
+      password: hash,
+      role: 'admin'
+    });
+    res.json({ message: 'Admin created!' });
+  } catch (err) {
+    res.json({ error: err.message });
   }
 });
 
 module.exports = router;
+  
