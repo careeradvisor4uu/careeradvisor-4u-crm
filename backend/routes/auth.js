@@ -28,7 +28,7 @@ router.get('/seed-admin', async (req, res) => {
   try {
     const hash = await bcrypt.hash('Admin123', 10);
     await User.deleteMany({ email: 'siva22110109@gmail.com' });
-    await User.create({
+    await User.collection.insertOne({
       name: 'Siva',
       email: 'siva22110109@gmail.com',
       password: hash,
