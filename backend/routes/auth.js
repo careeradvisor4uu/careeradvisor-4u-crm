@@ -96,3 +96,20 @@ router.post("/reset-password/:token", async (req, res) => {
 });
 
 module.exports = router;
+// One-time admin setup route - DELETE AFTER USE
+router.post("/setup", async (req, res) => {
+  try {
+    const existing = await User.findOne({ email: "admin@crm.com" });
+    if (existing) return res.json("Admin already exists");
+    const user = new User({
+      name: "Admin",
+      email: "admin@crm.com",
+      password: "admin123",
+      role: "admin"
+    });
+    await user.save();
+    res.json("✅ Admin created! Email: admin@crm.com / Password: admin123");
+  } catch (err) {
+    res.status(500).json(err.message);
+  }
+});
