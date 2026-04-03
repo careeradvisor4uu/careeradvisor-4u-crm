@@ -1,42 +1,39 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const http = require('http');
-const { Server } = require('socket.io');
-require('dotenv').config();
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+
+const authRoutes = require("./routes/auth");
+const leadsRoutes = require("./routes/leads");
+const usersRoutes = require("./routes/users");
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
 
-app.use(cors());
+// ── Middleware ────────────────────────────────────────────────
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "*",
+  credentials: true,
+}));
 app.use(express.json());
 
-app.use('/api/leads', require('./routes/leads'));
-app.use('/api/telecallers', require('./routes/telecallers'));
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api', require('./routes/auth'));
-app.use('/api/assignment', require('./routes/assignment'));
-app.use('/api/notifications', require('./routes/notifications'));
-app.use('/api/telecaller-dashboard', require('./routes/telecaller-dashboard'));
+// ── Routes ────────────────────────────────────────────────────
+app.use("/api", authRoutes);          // /api/login, /api/forgot-password, /api/reset-password/:token
+app.use("/api/leads", leadsRoutes);   // /api/leads CRUD
+app.use("/api/users", usersRoutes);   // /api/users CRUD (admin only)
 
-app.get('/', (req, res) => res.json({ status: 'CRM API running' }));
+// ── Health Check ──────────────────────────────────────────────
+app.get("/", (req, res) => res.json({ status: "Career Advisor 4U CRM API is running 🚀" }));
 
-io.on('connection', (socket) => {
-  socket.on('disconnect', () => {});
-});
+// ── MongoDB + Server Start ────────────────────────────────────
+const PORT = process.env.PORT || 5000;
 
-const { startNotificationScheduler } = require('./utils/pushNotify');
-
-mongoose.connect(process.env.MONGO_URI)
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log('Connected to MongoDB successfully');
-    startNotificationScheduler();
-    server.listen(process.env.PORT || 5000, () =>
-      console.log('Advanced CRM Backend Running on port 5000')
-    );
+    console.log("✅ MongoDB connected");
+    app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
   })
-  .catch(err => {
-    console.error('MongoDB connection error:', err.message);
+  .catch((err) => {
+    console.error("❌ MongoDB connection failed:", err.message);
     process.exit(1);
   });
