@@ -1,16 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
-import { Phone, MessageSquare, CheckCircle, Clock, Plus, X, Upload, Users, ChevronDown, LogOut, TrendingUp, Edit2, Trash2 } from "lucide-react";
+import { Phone, MessageSquare, Plus, LogOut, Upload, X, Edit2, Trash2, CheckCircle, Clock, Users, TrendingUp } from "lucide-react";
 
 const API_URL = "https://careeradvisor-4u-crm-1.onrender.com/api";
-const SOCKET_URL = "https://careeradvisor-4u-crm-1.onrender.com";
 
 function statusBadge(s) {
   const map = {
-    "New": "badge-new", "Contacted": "badge-contacted",
-    "Interested": "badge-interested", "Not Interested": "badge-not-interested",
-    "Closed": "badge-closed", "Converted": "badge-converted", "callback": "badge-callback",
+    New: "badge-new", Contacted: "badge-contacted", Interested: "badge-interested",
+    "Not Interested": "badge-notinterested", Closed: "badge-closed", Converted: "badge-converted",
   };
   return map[s] || "badge-new";
 }
@@ -25,6 +23,7 @@ function followupClass(date) {
   return "";
 }
 
+// ── User Management Modal ─────────────────────────────────────
 function UserManagementModal({ onClose, token }) {
   const headers = { Authorization: `Bearer ${token}` };
   const [users, setUsers] = useState([]);
@@ -47,7 +46,7 @@ function UserManagementModal({ onClose, token }) {
     setLoading(true); setMsg(""); setError("");
     try {
       await axios.post(`${API_URL}/users`, form, { headers });
-      setMsg(`User "${form.name}" created successfully!`);
+      setMsg(`✅ User "${form.name}" created successfully!`);
       setForm({ name: "", email: "", password: "", role: "caller" });
       fetchUsers();
     } catch (err) {
@@ -59,7 +58,7 @@ function UserManagementModal({ onClose, token }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal modal-lg">
         <div className="modal-header">
-          <h2>Manage Users</h2>
+          <h2>👥 Manage Users</h2>
           <button className="close-btn" onClick={onClose}><X size={16} /></button>
         </div>
         <div style={{marginBottom:"24px"}}>
@@ -68,15 +67,18 @@ function UserManagementModal({ onClose, token }) {
             <div className="form-grid">
               <div className="form-group">
                 <label>Full Name *</label>
-                <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="e.g. Ravi Kumar" required />
+                <input value={form.name} onChange={e => setForm({...form, name: e.target.value})}
+                  placeholder="e.g. Ravi Kumar" required />
               </div>
               <div className="form-group">
                 <label>Email *</label>
-                <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="ravi@example.com" required />
+                <input type="email" value={form.email} onChange={e => setForm({...form, email: e.target.value})}
+                  placeholder="ravi@example.com" required />
               </div>
               <div className="form-group">
                 <label>Password *</label>
-                <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})} placeholder="••••••••" required />
+                <input type="password" value={form.password} onChange={e => setForm({...form, password: e.target.value})}
+                  placeholder="••••••••" required />
               </div>
               <div className="form-group">
                 <label>Role</label>
@@ -87,16 +89,18 @@ function UserManagementModal({ onClose, token }) {
               </div>
             </div>
             {msg && <div style={{color:"green",marginBottom:"10px"}}>{msg}</div>}
-            {error && <div className="error-msg">{error}</div>}
+            {error && <div className="error-msg">⚠️ {error}</div>}
             <div className="modal-actions">
               <button className="btn btn-primary" type="submit" disabled={loading}>
-                {loading ? <span className="spinner" /> : "Create User"}
+                {loading ? <span className="spinner" /> : "➕ Create User"}
               </button>
             </div>
           </form>
         </div>
         <div>
-          <h3 style={{marginBottom:"12px", fontSize:"14px", fontWeight:"600"}}>Existing Users ({users.length})</h3>
+          <h3 style={{marginBottom:"12px", fontSize:"14px", fontWeight:"600"}}>
+            Existing Users ({users.length})
+          </h3>
           <div style={{overflowX:"auto"}}>
             <table>
               <thead>
@@ -110,7 +114,9 @@ function UserManagementModal({ onClose, token }) {
                     <td className="num-cell">{i + 1}</td>
                     <td><strong>{u.name}</strong></td>
                     <td className="mono">{u.email}</td>
-                    <td><span className={`badge ${u.role === "admin" ? "badge-converted" : "badge-contacted"}`}>{u.role}</span></td>
+                    <td><span className={`badge ${u.role === "admin" ? "badge-converted" : "badge-contacted"}`}>
+                      {u.role}
+                    </span></td>
                   </tr>
                 ))}
               </tbody>
@@ -122,6 +128,7 @@ function UserManagementModal({ onClose, token }) {
   );
 }
 
+// ── Forgot Password Page ──────────────────────────────────────
 function ForgotPasswordPage({ onBack }) {
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState("");
@@ -133,7 +140,7 @@ function ForgotPasswordPage({ onBack }) {
     setLoading(true); setMsg(""); setError("");
     try {
       await axios.post(`${API_URL}/forgot-password`, { email });
-      setMsg("Reset email sent! Check your inbox.");
+      setMsg("✅ Reset email sent! Check your inbox.");
     } catch (err) {
       setError(err.response?.data || "Something went wrong");
     } finally { setLoading(false); }
@@ -148,22 +155,24 @@ function ForgotPasswordPage({ onBack }) {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com" required />
           </div>
           {msg && <div style={{color:"green",marginBottom:"10px"}}>{msg}</div>}
-          {error && <div className="error-msg">{error}</div>}
+          {error && <div className="error-msg">⚠️ {error}</div>}
           <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
             {loading ? <span className="spinner" /> : "Send Reset Link"}
           </button>
         </form>
         <p style={{textAlign:"center",marginTop:"16px"}}>
-          <button className="btn btn-ghost btn-sm" onClick={onBack}>Back to Login</button>
+          <button className="btn btn-ghost btn-sm" onClick={onBack}>← Back to Login</button>
         </p>
       </div>
     </div>
   );
 }
 
+// ── Reset Password Page ───────────────────────────────────────
 function ResetPasswordPage({ token, onBack }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -177,7 +186,7 @@ function ResetPasswordPage({ token, onBack }) {
     setLoading(true); setMsg(""); setError("");
     try {
       await axios.post(`${API_URL}/reset-password/${token}`, { password });
-      setMsg("Password reset successful! You can now login.");
+      setMsg("✅ Password reset successful! You can now login.");
     } catch (err) {
       setError(err.response?.data || "Invalid or expired link");
     } finally { setLoading(false); }
@@ -192,26 +201,29 @@ function ResetPasswordPage({ token, onBack }) {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>New Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••" required />
           </div>
           <div className="form-group">
             <label>Confirm Password</label>
-            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="••••••••" required />
+            <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)}
+              placeholder="••••••••" required />
           </div>
           {msg && <div style={{color:"green",marginBottom:"10px"}}>{msg}</div>}
-          {error && <div className="error-msg">{error}</div>}
+          {error && <div className="error-msg">⚠️ {error}</div>}
           <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
             {loading ? <span className="spinner" /> : "Reset Password"}
           </button>
         </form>
         <p style={{textAlign:"center",marginTop:"16px"}}>
-          <button className="btn btn-ghost btn-sm" onClick={onBack}>Back to Login</button>
+          <button className="btn btn-ghost btn-sm" onClick={onBack}>← Back to Login</button>
         </p>
       </div>
     </div>
   );
 }
 
+// ── Login Page ────────────────────────────────────────────────
 function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -243,25 +255,30 @@ function LoginPage({ onLogin }) {
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label>Email</label>
-            <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com" required />
           </div>
           <div className="form-group">
             <label>Password</label>
-            <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required />
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••" required />
           </div>
-          {error && <div className="error-msg">{error}</div>}
+          {error && <div className="error-msg">⚠️ {error}</div>}
           <button className="btn btn-primary btn-block" type="submit" disabled={loading}>
             {loading ? <span className="spinner" /> : "Sign In"}
           </button>
         </form>
         <p style={{textAlign:"center",marginTop:"12px"}}>
-          <button className="btn btn-ghost btn-sm" onClick={() => setShowForgot(true)}>Forgot password?</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => setShowForgot(true)}>
+            Forgot password?
+          </button>
         </p>
       </div>
     </div>
   );
 }
 
+// ── Main App ──────────────────────────────────────────────────
 export default function App() {
   const urlToken = window.location.pathname.startsWith("/reset-password/")
     ? window.location.pathname.split("/reset-password/")[1]
@@ -280,7 +297,7 @@ export default function App() {
   const [editLead, setEditLead] = useState(null);
   const [previewData, setPreviewData] = useState([]);
   const [toast, setToast] = useState("");
-  const [form, setForm] = useState({ name: "", phone: "", status: "", followUp: "", followUpTime: "" });
+  const [form, setForm] = useState({ name: "", phone: "", status: "", followUpDate: "", time: "" });
   const fileRef = useRef();
 
   const token = localStorage.getItem("crm_token");
@@ -293,7 +310,7 @@ export default function App() {
     try {
       const res = await axios.get(`${API_URL}/leads`, { headers });
       setLeads(res.data);
-    } catch { showToast("Failed to load leads"); }
+    } catch { showToast("❌ Failed to load leads"); }
     finally { setLoading(false); }
   }
 
@@ -310,30 +327,36 @@ export default function App() {
 
   function openAdd() {
     setEditLead(null);
-    setForm({ name: "", phone: "", status: "", followUp: "", followUpTime: "" });
+    setForm({ name: "", phone: "", status: "", followUpDate: "", time: "" });
     setShowModal(true);
   }
 
   function openEdit(lead) {
     setEditLead(lead);
-    setForm({ name: lead.name, phone: lead.phone, status: lead.status, followUp: lead.followUp || "", followUpTime: lead.followUpTime || "" });
+    setForm({
+      name: lead.name,
+      phone: lead.phone,
+      status: lead.status,
+      followUpDate: lead.followUpDate || "",
+      time: lead.time || ""
+    });
     setShowModal(true);
   }
 
   async function saveLead() {
-    if (!form.name || !form.phone) { showToast("Name and phone required"); return; }
+    if (!form.name || !form.phone) { showToast("⚠️ Name and phone required"); return; }
     try {
       if (editLead) {
         await axios.put(`${API_URL}/leads/${editLead._id}`, form, { headers });
-        showToast("Lead updated");
+        showToast("✏️ Lead updated");
       } else {
         await axios.post(`${API_URL}/leads`, form, { headers });
-        showToast("Lead added");
+        showToast("✅ Lead added");
       }
       setShowModal(false);
       fetchLeads();
     } catch (e) {
-      showToast(e.response?.data || e.message);
+      showToast("❌ " + (e.response?.data || e.message));
     }
   }
 
@@ -341,9 +364,9 @@ export default function App() {
     if (!confirm("Delete this lead?")) return;
     try {
       await axios.delete(`${API_URL}/leads/${id}`, { headers });
-      showToast("Deleted");
+      showToast("🗑️ Deleted");
       fetchLeads();
-    } catch { showToast("Delete failed"); }
+    } catch { showToast("❌ Delete failed"); }
   }
 
   function handleFile(e) {
@@ -358,8 +381,8 @@ export default function App() {
         name: String(r.Name || r.name || "").trim(),
         phone: String(r.Phone || r.phone || r.Number || r.number || "").trim(),
         status: String(r.Status || r.status || "").trim(),
-        followUp: String(r.FollowUp || r.followUp || r.Followup || r["Follow-up"] || "").trim(),
-        followUpTime: String(r.FollowUpTime || r.followUpTime || "").trim(),
+        followUpDate: String(r.FollowUpDate || r.followUpDate || r.Followup || r["Follow-up"] || "").trim(),
+        time: String(r.Time || r.time || "").trim(),
       })).filter(r => r.name && r.phone);
       setPreviewData(mapped);
     };
@@ -369,9 +392,10 @@ export default function App() {
   async function importLeads() {
     let success = 0;
     for (const lead of previewData) {
-      try { await axios.post(`${API_URL}/leads`, lead, { headers }); success++; } catch {}
+      try { await axios.post(`${API_URL}/leads`, lead, { headers }); success++; }
+      catch {}
     }
-    showToast(`${success} leads imported!`);
+    showToast(`✅ ${success} leads imported!`);
     setPreviewData([]);
     setShowUpload(false);
     fetchLeads();
@@ -379,7 +403,8 @@ export default function App() {
 
   const filtered = leads.filter(l => {
     const matchFilter = filter === "All" || l.status === filter;
-    const matchSearch = l.name?.toLowerCase().includes(search.toLowerCase()) || l.phone?.includes(search);
+    const matchSearch = l.name?.toLowerCase().includes(search.toLowerCase()) ||
+                        l.phone?.includes(search);
     return matchFilter && matchSearch;
   });
 
@@ -467,21 +492,37 @@ export default function App() {
                   <div className="empty-state"><div className="empty-icon">📭</div><p>No leads found</p></div>
                 </td></tr>
               ) : filtered.map((l, i) => {
-                const fc = followupClass(l.followUp);
+                const fc = followupClass(l.followUpDate);
                 return (
                   <tr key={l._id}>
                     <td className="num-cell">{i + 1}</td>
                     <td><strong>{l.name}</strong></td>
                     <td className="mono">{l.phone}</td>
                     <td><span className={`badge ${statusBadge(l.status)}`}>{l.status}</span></td>
-                    <td>{l.followUp ? <span className={`followup ${fc}`}>📅 {l.followUp}</span> : <span className="muted">—</span>}</td>
-                    <td>{l.followUpTime ? <span>🕐 {l.followUpTime}</span> : <span className="muted">—</span>}</td>
+                    <td>
+                      {l.followUpDate
+                        ? <span className={`followup ${fc}`}>📅 {l.followUpDate}</span>
+                        : <span className="muted">—</span>}
+                    </td>
+                    <td>
+                      {l.time
+                        ? <span>🕐 {l.time}</span>
+                        : <span className="muted">—</span>}
+                    </td>
                     <td>
                       <div className="action-btns">
-                        <button className="btn btn-call btn-xs" onClick={() => window.location.href = `tel:${l.phone}`}><Phone size={12} /> Call</button>
-                        <button className="btn btn-msg btn-xs" onClick={() => window.open(`https://wa.me/91${l.phone}`, "_blank")}><MessageSquare size={12} /> Message</button>
-                        <button className="btn btn-outline btn-xs" onClick={() => openEdit(l)}><Edit2 size={12} /></button>
-                        <button className="btn btn-danger btn-xs" onClick={() => deleteLead(l._id)}><Trash2 size={12} /></button>
+                        <button className="btn btn-call btn-xs" onClick={() => window.location.href = `tel:${l.phone}`}>
+                          <Phone size={12} /> Call
+                        </button>
+                        <button className="btn btn-msg btn-xs" onClick={() => window.open(`https://wa.me/91${l.phone}`, "_blank")}>
+                          <MessageSquare size={12} /> Message
+                        </button>
+                        <button className="btn btn-outline btn-xs" onClick={() => openEdit(l)}>
+                          <Edit2 size={12} />
+                        </button>
+                        <button className="btn btn-danger btn-xs" onClick={() => deleteLead(l._id)}>
+                          <Trash2 size={12} />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -500,11 +541,27 @@ export default function App() {
               <button className="close-btn" onClick={() => setShowModal(false)}><X size={16} /></button>
             </div>
             <div className="form-grid">
-              <div className="form-group"><label>Full Name *</label><input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="e.g. Ravi Kumar" /></div>
-              <div className="form-group"><label>Phone Number *</label><input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="e.g. 9876543210" /></div>
-              <div className="form-group"><label>Status</label><input value={form.status} onChange={e => setForm({...form, status: e.target.value})} placeholder="e.g. Interested" /></div>
-              <div className="form-group"><label>Follow-up Date</label><input type="date" value={form.followUp} onChange={e => setForm({...form, followUp: e.target.value})} /></div>
-              <div className="form-group"><label>Follow-up Time</label><input type="time" value={form.followUpTime} onChange={e => setForm({...form, followUpTime: e.target.value})} /></div>
+              <div className="form-group">
+                <label>Full Name *</label>
+                <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="e.g. Ravi Kumar" />
+              </div>
+              <div className="form-group">
+                <label>Phone Number *</label>
+                <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="e.g. 9876543210" />
+              </div>
+              <div className="form-group">
+                <label>Status</label>
+                <input value={form.status} onChange={e => setForm({...form, status: e.target.value})}
+                  placeholder="e.g. Interested, Called back..." />
+              </div>
+              <div className="form-group">
+                <label>Follow-up Date</label>
+                <input type="date" value={form.followUpDate} onChange={e => setForm({...form, followUpDate: e.target.value})} />
+              </div>
+              <div className="form-group">
+                <label>Follow-up Time</label>
+                <input type="time" value={form.time} onChange={e => setForm({...form, time: e.target.value})} />
+              </div>
             </div>
             <div className="modal-actions">
               <button className="btn btn-outline" onClick={() => setShowModal(false)}>Cancel</button>
@@ -518,10 +575,10 @@ export default function App() {
         <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowUpload(false)}>
           <div className="modal modal-lg">
             <div className="modal-header">
-              <h2>Bulk Upload via Excel</h2>
+              <h2>📊 Bulk Upload via Excel</h2>
               <button className="close-btn" onClick={() => setShowUpload(false)}><X size={16} /></button>
             </div>
-            <p className="upload-hint">Columns required: <strong>Name, Phone, Status, FollowUp</strong></p>
+            <p className="upload-hint">Columns required: <strong>Name, Phone, Status, FollowUpDate, Time</strong></p>
             <div className="upload-zone" onClick={() => fileRef.current.click()}>
               <div className="upload-icon">📊</div>
               <p><strong>Click to choose</strong> or drag & drop Excel file</p>
@@ -534,7 +591,7 @@ export default function App() {
                   <span>{previewData.length} leads ready to import</span>
                   <div style={{display:"flex",gap:"8px"}}>
                     <button className="btn btn-outline btn-sm" onClick={() => setPreviewData([])}>Clear</button>
-                    <button className="btn btn-primary btn-sm" onClick={importLeads}>Import All</button>
+                    <button className="btn btn-primary btn-sm" onClick={importLeads}>✓ Import All</button>
                   </div>
                 </div>
                 <div className="preview-table-wrap">
@@ -542,7 +599,11 @@ export default function App() {
                     <thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Follow-up</th></tr></thead>
                     <tbody>
                       {previewData.map((r, i) => (
-                        <tr key={i}><td>{r.name}</td><td>{r.phone}</td><td><span className={`badge ${statusBadge(r.status)}`}>{r.status}</span></td><td>{r.followUp || "—"}</td></tr>
+                        <tr key={i}>
+                          <td>{r.name}</td><td>{r.phone}</td>
+                          <td><span className={`badge ${statusBadge(r.status)}`}>{r.status}</span></td>
+                          <td>{r.followUpDate || "—"}</td>
+                        </tr>
                       ))}
                     </tbody>
                   </table>
