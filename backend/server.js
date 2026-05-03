@@ -6,6 +6,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const leadsRoutes = require("./routes/leads");
 const usersRoutes = require("./routes/users");
+const callerStatsRoutes = require("./routes/callerStats");
 
 const app = express();
 
@@ -17,16 +18,16 @@ app.use(cors({
 app.use(express.json());
 
 // ── Routes ────────────────────────────────────────────────────
-app.use("/api", authRoutes);          // /api/login, /api/forgot-password, /api/reset-password/:token
-app.use("/api/leads", leadsRoutes);   // /api/leads CRUD
-app.use("/api/users", usersRoutes);   // /api/users CRUD (admin only)
+app.use("/api", authRoutes);
+app.use("/api/leads", leadsRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api", callerStatsRoutes);
 
 // ── Health Check ──────────────────────────────────────────────
 app.get("/", (req, res) => res.json({ status: "Career Advisor 4U CRM API is running 🚀" }));
 
 // ── MongoDB + Server Start ────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
